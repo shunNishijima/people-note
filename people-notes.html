@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>People Notes - 人脈メモ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f5f5f7;
+            --card: #ffffff;
+            --border: #e5e5ea;
+            --text: #1c1c1e;
+            --text-secondary: #8e8e93;
+            --text-muted: #aeaeb2;
+            --accent: #007aff;
+            --accent-light: #e5f1ff;
+            --success: #34c759;
+            --warning: #ff9500;
+            --purple: #af52de;
+            --pink: #ff2d55;
+            --teal: #5ac8fa;
+            --indigo: #5856d6;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #000000;
+                --card: #1c1c1e;
+                --border: #38383a;
+                --text: #ffffff;
+                --text-secondary: #8e8e93;
+                --text-muted: #636366;
+                --accent: #0a84ff;
+                --accent-light: #1a3a5c;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+            padding-bottom: 100px;
+        }
+
+        /* Header */
+        header {
+            padding: 16px 0 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Search */
+        .search-section {
+            margin-bottom: 16px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            gap: 10px;
+        }
+
+        .search-box svg {
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            flex: 1;
+            font-size: 16px;
+            font-family: inherit;
+            background: none;
+            border: none;
+            color: var(--text);
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Stats */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* Add Button */
+        .add-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            background: var(--accent);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            transition: opacity 0.2s;
+        }
+
+        .add-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            border-color: var(--accent);
+        }
+
+        .tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* People List */
+        .people-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .person-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .person-card:hover {
+            border-color: var(--accent);
+        }
+
+        .person-header {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .person-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .person-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .person-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .person-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .person-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .person-toggle {
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        .person-card.expanded .person-toggle {
+            transform: rotate(180deg);
+        }
+
+        /* Notes */
+        .person-notes {
+            display: none;
+            border-top: 1px solid var(--border);
+        }
+
+        .person-card.expanded .person-notes {
+            display: block;
+        }
+
+        .note-item {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .note-item:last-child {
+            border-bottom: none;
+        }
+
+        .note-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .note-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .note-item:hover .note-actions {
+            opacity: 1;
+        }
+
+        .note-action-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: var(--bg);
+            border-radius: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .note-action-btn:hover {
+            color: var(--text);
+        }
+
+        .note-action-btn.delete:hover {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .note-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+        }
+
+        /* Add Note */
+        .add-note-section {
+            padding: 14px 16px;
+            background: var(--bg);
+        }
+
+        .add-note-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            outline: none;
+            resize: none;
+            min-height: 60px;
+        }
+
+        .add-note-input:focus {
+            border-color: var(--accent);
+        }
+
+        .add-note-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .add-note-btn {
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .add-note-btn.cancel {
+            background: var(--card);
+            color: var(--text-secondary);
+        }
+
+        .add-note-btn.confirm {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Person Actions */
+        .person-actions {
+            padding: 12px 16px;
+            background: var(--bg);
+            display: flex;
+            gap: 8px;
+        }
+
+        .person-action-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 13px;
+            font-family: inherit;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .person-action-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .person-action-btn.delete:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--card);
+            border-radius: 20px 20px 0 0;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal {
+            transform: translateY(0);
+        }
+
+        .modal-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            font-family: inherit;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent);
+        }
+
+        /* Tag Selector */
+        .tag-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag-option {
+            padding: 10px 14px;
+            font-size: 13px;
+            font-family: inherit;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag-option:hover {
+            border-color: var(--accent);
+        }
+
+        .tag-option.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Color Selector */
+        .color-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: var(--text);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            font-family: inherit;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .modal-btn.cancel {
+            background: var(--bg);
+            color: var(--text-secondary);
+        }
+
+        .modal-btn.confirm {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Colors */
+        .color-blue { background: #007aff; }
+        .color-purple { background: #af52de; }
+        .color-pink { background: #ff2d55; }
+        .color-orange { background: #ff9500; }
+        .color-green { background: #34c759; }
+        .color-teal { background: #5ac8fa; }
+        .color-indigo { background: #5856d6; }
+        .color-gray { background: #8e8e93; }
+
+        /* Alphabet Groups */
+        .alphabet-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 12px 4px 8px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👥 People Notes</h1>
+            <p class="subtitle">人脈と会話の記録</p>
+        </header>
+
+        <!-- Search -->
+        <div class="search-section">
+            <div class="search-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" class="search-input" id="searchInput" placeholder="名前で検索...">
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value" id="peopleCount">0</div>
+                <div class="stat-label">人</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="notesCount">0</div>
+                <div class="stat-label">メモ</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="recentCount">0</div>
+                <div class="stat-label">今月</div>
+            </div>
+        </div>
+
+        <!-- Add Button -->
+        <button class="add-btn" onclick="showPersonModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            人を追加
+        </button>
+
+        <!-- Tabs -->
+        <div class="tabs" id="tabs">
+            <button class="tab active" data-filter="all">すべて</button>
+            <button class="tab" data-filter="work">💼 仕事</button>
+            <button class="tab" data-filter="friend">👫 友人</button>
+            <button class="tab" data-filter="family">👨‍👩‍👧 家族</button>
+            <button class="tab" data-filter="other">📌 その他</button>
+        </div>
+
+        <!-- People List -->
+        <div id="peopleList"></div>
+    </div>
+
+    <!-- Person Modal -->
+    <div class="modal-overlay" id="personModal">
+        <div class="modal">
+            <div class="modal-handle"></div>
+            <h2 class="modal-title" id="personModalTitle">人を追加</h2>
+            
+            <div class="form-group">
+                <label class="form-label">名前</label>
+                <input type="text" class="form-input" id="nameInput" placeholder="山田 太郎">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">所属・関係（任意）</label>
+                <input type="text" class="form-input" id="orgInput" placeholder="例: ABC株式会社、大学の友人">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">カテゴリ</label>
+                <div class="tag-selector" id="tagSelector">
+                    <button class="tag-option selected" data-tag="work">💼 仕事</button>
+                    <button class="tag-option" data-tag="friend">👫 友人</button>
+                    <button class="tag-option" data-tag="family">👨‍👩‍👧 家族</button>
+                    <button class="tag-option" data-tag="other">📌 その他</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">カラー</label>
+                <div class="color-selector" id="colorSelector">
+                    <div class="color-option color-blue selected" data-color="blue"></div>
+                    <div class="color-option color-purple" data-color="purple"></div>
+                    <div class="color-option color-pink" data-color="pink"></div>
+                    <div class="color-option color-orange" data-color="orange"></div>
+                    <div class="color-option color-green" data-color="green"></div>
+                    <div class="color-option color-teal" data-color="teal"></div>
+                    <div class="color-option color-indigo" data-color="indigo"></div>
+                    <div class="color-option color-gray" data-color="gray"></div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="hidePersonModal()">キャンセル</button>
+                <button class="modal-btn confirm" onclick="savePerson()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'people_notes_data';
+        
+        const TAG_LABELS = {
+            'work': '💼 仕事',
+            'friend': '👫 友人',
+            'family': '👨‍👩‍👧 家族',
+            'other': '📌 その他'
+        };
+
+        const COLORS = {
+            'blue': '#007aff',
+            'purple': '#af52de',
+            'pink': '#ff2d55',
+            'orange': '#ff9500',
+            'green': '#34c759',
+            'teal': '#5ac8fa',
+            'indigo': '#5856d6',
+            'gray': '#8e8e93'
+        };
+
+        let data = loadData();
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let editingPersonId = null;
+        let selectedTag = 'work';
+        let selectedColor = 'blue';
+
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) return JSON.parse(saved);
+            return { people: [] };
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            const now = new Date();
+            const diff = now - d;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            
+            if (days === 0) return '今日';
+            if (days === 1) return '昨日';
+            if (days < 7) return `${days}日前`;
+            
+            return d.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' });
+        }
+
+        function getInitials(name) {
+            const parts = name.trim().split(/\s+/);
+            if (parts.length >= 2) {
+                return parts[0][0] + parts[1][0];
+            }
+            return name.slice(0, 2);
+        }
+
+        // Person Modal
+        function showPersonModal(personId = null) {
+            editingPersonId = personId;
+            const title = document.getElementById('personModalTitle');
+
+            if (personId) {
+                const person = data.people.find(p => p.id === personId);
+                if (person) {
+                    title.textContent = '編集';
+                    document.getElementById('nameInput').value = person.name;
+                    document.getElementById('orgInput').value = person.org || '';
+                    selectTag(person.tag);
+                    selectColor(person.color);
+                }
+            } else {
+                title.textContent = '人を追加';
+                document.getElementById('nameInput').value = '';
+                document.getElementById('orgInput').value = '';
+                selectTag('work');
+                selectColor('blue');
+            }
+
+            document.getElementById('personModal').classList.add('show');
+            document.getElementById('nameInput').focus();
+        }
+
+        function hidePersonModal() {
+            document.getElementById('personModal').classList.remove('show');
+            editingPersonId = null;
+        }
+
+        function selectTag(tag) {
+            selectedTag = tag;
+            document.querySelectorAll('.tag-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.tag === tag);
+            });
+        }
+
+        function selectColor(color) {
+            selectedColor = color;
+            document.querySelectorAll('.color-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.color === color);
+            });
+        }
+
+        function savePerson() {
+            const name = document.getElementById('nameInput').value.trim();
+            if (!name) return;
+
+            if (editingPersonId) {
+                const person = data.people.find(p => p.id === editingPersonId);
+                if (person) {
+                    person.name = name;
+                    person.org = document.getElementById('orgInput').value.trim();
+                    person.tag = selectedTag;
+                    person.color = selectedColor;
+                }
+            } else {
+                data.people.push({
+                    id: generateId(),
+                    name: name,
+                    org: document.getElementById('orgInput').value.trim(),
+                    tag: selectedTag,
+                    color: selectedColor,
+                    notes: [],
+                    createdAt: new Date().toISOString()
+                });
+            }
+
+            saveData();
+            render();
+            hidePersonModal();
+        }
+
+        function deletePerson(personId) {
+            if (!confirm('この人物とすべてのメモを削除しますか？')) return;
+            data.people = data.people.filter(p => p.id !== personId);
+            saveData();
+            render();
+        }
+
+        // Notes
+        function addNote(personId) {
+            const input = document.getElementById(`note-input-${personId}`);
+            const content = input.value.trim();
+            if (!content) return;
+
+            const person = data.people.find(p => p.id === personId);
+            if (person) {
+                person.notes.unshift({
+                    id: generateId(),
+                    content: content,
+                    createdAt: new Date().toISOString()
+                });
+                saveData();
+                render();
+            }
+        }
+
+        function deleteNote(personId, noteId) {
+            const person = data.people.find(p => p.id === personId);
+            if (person) {
+                person.notes = person.notes.filter(n => n.id !== noteId);
+                saveData();
+                render();
+            }
+        }
+
+        function togglePerson(personId) {
+            const card = document.querySelector(`[data-person-id="${personId}"]`);
+            card.classList.toggle('expanded');
+        }
+
+        // Filter & Search
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.filter === filter);
+            });
+            render();
+        }
+
+        function handleSearch(query) {
+            searchQuery = query.toLowerCase();
+            render();
+        }
+
+        // Stats
+        function updateStats() {
+            const peopleCount = data.people.length;
+            const notesCount = data.people.reduce((sum, p) => sum + p.notes.length, 0);
+            
+            const thisMonth = new Date();
+            thisMonth.setDate(1);
+            thisMonth.setHours(0, 0, 0, 0);
+            
+            const recentCount = data.people.reduce((sum, p) => {
+                return sum + p.notes.filter(n => new Date(n.createdAt) >= thisMonth).length;
+            }, 0);
+
+            document.getElementById('peopleCount').textContent = peopleCount;
+            document.getElementById('notesCount').textContent = notesCount;
+            document.getElementById('recentCount').textContent = recentCount;
+        }
+
+        // Render
+        function render() {
+            updateStats();
+            renderPeopleList();
+        }
+
+        function renderPeopleList() {
+            const container = document.getElementById('peopleList');
+            
+            let filtered = data.people;
+            
+            // Filter by tag
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(p => p.tag === currentFilter);
+            }
+            
+            // Filter by search
+            if (searchQuery) {
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(searchQuery) ||
+                    (p.org && p.org.toLowerCase().includes(searchQuery))
+                );
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👥</div>
+                        <p class="empty-text">${searchQuery ? '検索結果がありません' : '人を追加して会話を記録しましょう'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by latest note or creation date
+            filtered.sort((a, b) => {
+                const aLatest = a.notes.length > 0 ? new Date(a.notes[0].createdAt) : new Date(a.createdAt);
+                const bLatest = b.notes.length > 0 ? new Date(b.notes[0].createdAt) : new Date(b.createdAt);
+                return bLatest - aLatest;
+            });
+
+            container.innerHTML = filtered.map(person => {
+                const initials = getInitials(person.name);
+                const lastNote = person.notes.length > 0 ? person.notes[0] : null;
+                const lastDate = lastNote ? formatDate(lastNote.createdAt) : '新規';
+
+                const notesHtml = person.notes.map(note => `
+                    <div class="note-item">
+                        <div class="note-header">
+                            <span class="note-date">${formatDate(note.createdAt)}</span>
+                            <div class="note-actions">
+                                <button class="note-action-btn delete" onclick="event.stopPropagation(); deleteNote('${person.id}', '${note.id}')">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="note-content">${escapeHtml(note.content)}</div>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="person-card" data-person-id="${person.id}">
+                        <div class="person-header" onclick="togglePerson('${person.id}')">
+                            <div class="person-avatar color-${person.color}">${initials}</div>
+                            <div class="person-info">
+                                <div class="person-name">${escapeHtml(person.name)}</div>
+                                <div class="person-meta">
+                                    <span class="person-tag">${TAG_LABELS[person.tag]}</span>
+                                    ${person.org ? `<span>${escapeHtml(person.org)}</span>` : ''}
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 12px; color: var(--text-muted);">${lastDate}</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">${person.notes.length}件のメモ</div>
+                            </div>
+                            <svg class="person-toggle" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="person-notes">
+                            <div class="add-note-section">
+                                <textarea class="add-note-input" id="note-input-${person.id}" placeholder="話した内容をメモ..." onclick="event.stopPropagation()"></textarea>
+                                <div class="add-note-actions">
+                                    <button class="add-note-btn confirm" onclick="event.stopPropagation(); addNote('${person.id}')">メモを追加</button>
+                                </div>
+                            </div>
+                            ${notesHtml || '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 13px;">まだメモがありません</div>'}
+                            <div class="person-actions">
+                                <button class="person-action-btn" onclick="event.stopPropagation(); showPersonModal('${person.id}')">編集</button>
+                                <button class="person-action-btn delete" onclick="event.stopPropagation(); deletePerson('${person.id}')">削除</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Event Listeners
+        document.querySelectorAll('.tag-option').forEach(opt => {
+            opt.addEventListener('click', () => selectTag(opt.dataset.tag));
+        });
+
+        document.querySelectorAll('.color-option').forEach(opt => {
+            opt.addEventListener('click', () => selectColor(opt.dataset.color));
+        });
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => setFilter(tab.dataset.filter));
+        });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            handleSearch(e.target.value);
+        });
+
+        document.getElementById('personModal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                hidePersonModal();
+            }
+        });
+
+        document.getElementById('nameInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') savePerson();
+        });
+
+        // Init
+        render();
+    </script>
+</body>
+</html>
